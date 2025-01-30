@@ -1,0 +1,35 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+' Сервисы
+System_Boundary(s1, "Система компании") {
+    System_Boundary(system_user_service, "Сервис пользователей"){
+        System(s_user, "Сервис управления профилями", "Хранит информацию о пользователях, их заказах, избранном и т.д.")
+        System(s_autorize, "Сервис авторизации", "Осуществляет проверку прав пользователя для работы в системе.")
+    }
+    System_Boundary(system_trade_service, "Сервис товарной системы") {
+        System(s_order, "Сервис заказов", "Обрабатывает создание, изменение и отслеживание заказов.")
+        System(s_catalog, "Сервис товарного каталога", "Управляет товарами, ценами и характеристиками.")
+        System(s_payment, "Сервис заказов", "Обрабатывает создание, изменение и отслеживание заказов.")
+    }
+    System_Boundary(system_delivery_service, "Сервис доставки") {
+        System(s_route, "Сервис управления маршрутами/логистики", "Обрабатывает создание, изменение маршрутов.")
+        System(s_tracking, "Сервис отслеживания доставки", "Отслеживает пермещение и статус заказа.")
+        System(s_interaction, "Сервис взаимодействия с внешними службами", "Реализует обмен данными о доставках с партнерскими службами.")
+    }
+    System_Boundary(system_warehouse_service, "Сервис управления складами") {
+
+
+
+    }
+    System_Boundary(system_finance_service, "Финансовый сервис\бэкофис") {
+
+
+        
+    }
+}
+
+System_Boundary(s2, "Система поставщиков") {
+     System_Boundary(system_provider_service, "Сервис по управления поставками")   
+}
+@enduml
