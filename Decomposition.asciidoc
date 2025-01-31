@@ -48,3 +48,9 @@ image::out/Diagram_new1/Diagram_new1.svg[]
 image::out/Diagram_new2/Diagram_new2.svg[]
 
 == Контекстная карта
+
+image::out/Diagram_new3/Diagram_new3.svg[]
+
+== Диаграмма контейнеров
+
+image::out/Diagram_new4/Diagram_new4.svg[]
