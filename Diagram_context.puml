@@ -1,28 +1,15 @@
 @startuml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
 
-' Определение участников системы
+'Элементы диаграммы
 Person(user, "Пользователь", "Пользователь системы")
+System(s2, "Система поставщиков", "Система компании поставщиков по реализации товаров и доставки.")
 
-' Сервисы
-System_Boundary(s1, "Система управления заказами") {
-    System(system_user_service, "Сервис пользователей", "Управляет профилями пользователей и авторизацией.")
-    System(system_catalog_service, "Сервис товарного каталога", "Управляет товарами, ценами и характеристиками.")
-    System(system_order_service, "Сервис заказов", "Обрабатывает создание, изменение и отслеживание заказов.")
-    System(system_delivery_service, "Сервис доставки", "Организует доставку товаров.")
-    System(system_warehouse_service, "Сервис управления складами", "Управляет складами и товарными запасами.")
-    System(system_finance_service, "Финансовый сервис", "Обрабатывает платежи и генерирует финансовые отчеты.")
+System_Boundary(s, "Система компании") {
+    System(s1, "Система компании", "Внутренняя система компании по продаже строительных материалов и товаров для дома.")
 }
 
-' Связи
-Rel(user, system_user_service, "Взаимодействует с сервисом профилей")
-Rel(user, system_catalog_service, "Ищет товары и проверят их наличие")
-Rel(user, system_order_service, "Проверка статуса заказа")
-Rel(system_user_service, system_order_service, "Отправка данных о заказах")
-Rel(system_order_service, system_catalog_service, "Получение информации о товарах")
-Rel(system_order_service, system_delivery_service, "Информация о доставке")
-Rel(system_order_service, system_finance_service, "Обработка платежей")
-Rel(system_delivery_service, system_warehouse_service, "Координация логистики и запасов")
-Rel(system_catalog_service, system_warehouse_service, "Координация наличия")
-
+'Связи между элементами диаграммы
+Rel(user, s1, "")
+Rel(s1, s2, "")
 @enduml
