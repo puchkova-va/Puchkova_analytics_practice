@@ -1,0 +1,60 @@
+@startuml
+
+entity "User" as users {
+  + user_id: string
+  + first_name: string
+  + last_name: string
+  + email: string
+  + phone_number: string
+  + role: string
+  + password: string
+  + orders: array
+}
+
+entity "Order" as orders {
+  + order_id: string
+  + user_id: string
+  + order_date: date
+  + delivery_address: string
+  + order_status: string
+  + items: array
+  + payment: object
+  + delivery: object
+}
+
+entity "Order_Items" as order_items {
+  + product_id: string
+  + product_name: string
+  + quantity: int
+  + price: float
+}
+
+entity "Payment" as payment {
+  + payment_id: string
+  + payment_date: date
+  + amount: float
+  + payment_status: string
+}
+
+entity "Delivery" as delivery {
+  + delivery_id: string
+  + route: object
+  + delivery_date: date
+  + delivery_status: string
+}
+
+entity "Route" as route {
+  + route_id: string
+  + start_point: string
+  + end_point: string
+  + route_length: int
+  + estimated_time: string
+}
+
+users -- orders 
+orders -- order_items 
+orders -- payment 
+orders -- delivery 
+delivery -- route 
+
+@enduml
