@@ -73,6 +73,7 @@ entity Stock {
   StorageID: int (FK)
   QuantityInStock: int
   LastUpdated: datetime
+  Reserved: int
 }
 
 ' Связи
