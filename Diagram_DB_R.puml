@@ -27,7 +27,6 @@ entity Product {
   Name: string
   Description: string
   Price: decimal (10, 2)
-  StockQuantity: int (FK)
 }
 
 entity Delivery {
@@ -46,11 +45,10 @@ entity Route {
   TravelTime: time
 }
 
-entity Inventory {
-  *InventoryID: int (PK, Auto Increment)
-  ProductID: int (FK)
-  Quantity: int
-  InventoryDate: datetime
+entity Storage {
+  *StorageID: int (PK, Auto Increment)
+  Name: string
+  Location: string
 }
 
 entity Payment {
@@ -72,27 +70,31 @@ entity Tracking {
 entity Stock {
   *StockID: int (PK, Auto Increment)
   ProductID: int (FK)
+  StorageID: int (FK)
   QuantityInStock: int
   LastUpdated: datetime
+  Reserved: int
 }
 
 ' Связи
 User ||--o{ Order : "1..N"
 
-Order ||--|| Delivery : "1..1"
+Order ||--|| Delivery : "1..N"
 Delivery ||--|| Route : "1..1"
 Product ||--|| Stock : "1..1"
-Stock ||--o{ Inventory : "1..N"
+Stock ||--o{ Storage : "1..N"
 Order ||--|| Payment : "1..1"
 Order ||--o{ Tracking : "1..N"
 
 ' Промежуточная таблица для связи M:N между Order и Product
-entity OrderProduct {
+entity OrderItems {
   *OrderID: int (FK)
   *ProductID: int (FK)
+  Quantity
+  Status
 }
 
-Order ||--o{ OrderProduct : "1..N"
-Product ||--o{ OrderProduct : "1..N"
+Order ||--o{ OrderItems : "N..1"
+Product ||--o{ OrderItems : "1..N"
 
 @enduml
