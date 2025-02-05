@@ -51,10 +51,10 @@ entity "Route" as route {
   + estimated_time: string
 }
 
-users -- orders 
-orders -- order_items 
-orders -- payment 
-orders -- delivery 
-delivery -- route 
+users -- orders : "Сcылка по user_id"
+orders -- order_items : "Вложенность"
+orders -- payment : "Вложенность"
+orders -- delivery : "Ссылка по delivery_id"
+delivery -- route : "Вложенность"
 
 @enduml
