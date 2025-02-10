@@ -17,9 +17,6 @@ paths:
             schema:
               type: object
               properties:
-                orderId:
-                  type: integer
-                  description: ID заказа
                 userId:
                   type: integer
                   description: ID пользователя, который создает заказ
@@ -32,16 +29,10 @@ paths:
                 payment:
                   type: object
                   properties:  
-                    payment_id:
-                      type: integer
-                      description: ID оплаты
-                    payment_date: 
-                      type: string
-                      description: дата оплаты 
                     amount: 
                       type: integer
                       description: Оплаченная сумма
-                    payment.status:
+                    payment_status:
                       type: string
                       description: Описание статуса оплаты
                 items:
@@ -68,9 +59,26 @@ paths:
           description: Ошибка при создании заказа
 
     get:
-      summary: Просмотр всех заказов
+      summary: Просмотр всех заказов с определенным статусом 
       description: Получение списка всех заказов
       operationId: getAllOrders
+      parameters:
+        - name: Статус заказа
+          in: query
+          description: Фильтрация по статусу заказа (например, новый, в обработке, оплачен).
+          required: false
+          schema:
+            type: string
+            enum:
+             - новый
+             - в обработке
+             - оплачен
+             - отправлен
+             - в пути
+             - доставлен
+             - завершен
+             - отменен
+             - возвращен
       responses:
         '200':
           description: Список всех заказов
@@ -103,7 +111,7 @@ paths:
                       amount: 
                         type: integer
                         description: Оплаченная сумма
-                      payment.status:
+                      payment_status:
                         type: string
                         description: Описание статуса оплаты
                   items:
@@ -123,11 +131,53 @@ paths:
                         price: 
                           type: integer
                           description: Цена товара
+                  order_status:
+                    type: string
+                    description: Статус заказа
+    patch:
+      summary: Обновление адреса доставки
+      description: Изменение адреса доставки для существующего заказа
+      operationId: updateDeliveryAddress
+      parameters:
+        - name: orderId
+          in: path
+          description: ID заказа, для которого нужно изменить адрес доставки
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                delivery_address:
+                  type: string
+                  description: Новый адрес доставки
+      responses:
+        '200':
+          description: Успешное обновление адреса доставки
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orderId:
+                    type: integer
+                    description: ID заказа
+                  new_delivery_address:
+                    type: string
+                    description: Новый адрес доставки
+        '400':
+          description: Неверный запрос, например, если не передан новый адрес
+        '404':
+          description: Заказ с указанным ID не найден
   /orders/{orderId}:
     get:
       summary: Просмотр информации о заказе по ID
       description: Получение информации о заказе по его уникальному идентификатору
-      operationId: getOrderById
+      operationId: get-Order-By-Id
       parameters:
         - name: orderId
           in: path
@@ -167,7 +217,7 @@ paths:
                       amount: 
                         type: integer
                         description: Оплаченная сумма
-                      payment.status:
+                      payment_status:
                         type: string
                         description: Описание статуса оплаты
                   items:
@@ -208,36 +258,142 @@ paths:
           content:
             application/json:
               schema:
+                type: array
+                items: 
+                  type: object
+                  properties:
+                    orderId:
+                      type: integer
+                      description: ID заказа
+                    userId:
+                      type: integer
+                      description: ID пользователя, который создает заказ
+                    order_date:
+                      type: string
+                      description: Дата офформления заказа
+                    delivery_address: 
+                      type: string
+                      description: Адрес доставки заказа
+                    payment:
+                      type: object
+                      properties:  
+                        payment_id:
+                          type: integer
+                          description: ID оплаты
+                        payment_date: 
+                          type: string
+                          description: дата оплаты 
+                        amount: 
+                          type: integer
+                          description: Оплаченная сумма
+                        payment_status:
+                          type: string
+                          description: Описание статуса оплаты
+                    items:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          product_id:
+                            type: integer
+                            description: ID товара
+                          product_name:
+                            type: string
+                            description: Наименование товара
+                          quantity:
+                            type: integer
+                            description: Количество товара
+                          price: 
+                            type: integer
+                            description: Цена товара
+        '404':
+          description: Пользователь не найден или у него нет заказов
+
+  /products:
+    post:
+      summary: Создание нового продукта
+      description: Добавление нового товара в систему
+      operationId: createProduct
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product_name:
+                  type: string
+                  description: Наименование товара
+                quantity:
+                  type: integer
+                  description: Количество товара
+                price:
+                  type: integer
+                  description: Цена товара
+      responses:
+        '201':
+          description: Продукт успешно создан
+          content:
+            application/json:
+              schema:
                 type: object
                 properties:
-                  orderId:
+                  product_id:
                     type: integer
-                    description: ID заказа
-                  userId:
+                    description: ID нового продукта
+                  product_name:
+                    type: string
+                    description: Наименование товара
+                  quantity:
                     type: integer
-                    description: ID пользователя, который создает заказ
-                  order_date:
-                    type: string
-                    description: Дата офформления заказа
-                  delivery_address: 
-                    type: string
-                    description: Адрес доставки заказа
-                  payment:
-                    type: object
-                    properties:  
-                      payment_id:
-                        type: integer
-                        description: ID оплаты
-                      payment_date: 
-                        type: string
-                        description: дата оплаты 
-                      amount: 
-                        type: integer
-                        description: Оплаченная сумма
-                      payment.status:
-                        type: string
-                        description: Описание статуса оплаты
-                  items:
+                    description: Количество товара
+                  price:
+                    type: integer
+                    description: Цена товара
+        '400':
+          description: Ошибка в запросе, например, если отсутствует обязательное поле
+        '500':
+          description: Внутренняя ошибка сервера
+    get:
+      summary: Получить список товаров, доступных для заказа
+      description: Получение списка товаров, которые доступны для размещения заказа
+      operationId: getAvailableProducts
+      parameters:
+        - name: page
+          in: query
+          description: Номер страницы для получения данных
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          description: Количество элементов на странице
+          required: false
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: Список доступных товаров
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_count:
+                    type: integer
+                    description: Общее количество элементов
+                  page:
+                    type: integer
+                    description: Номер текущей страницы
+                  limit:
+                    type: integer
+                    description: Количество элементов на странице
+                  items:                
                     type: array
                     items:
                       type: object
@@ -254,36 +410,6 @@ paths:
                         price: 
                           type: integer
                           description: Цена товара
-        '404':
-          description: Пользователь не найден или у него нет заказов
-
-  /products:
-    get:
-      summary: Получить список товаров, доступных для заказа
-      description: Получение списка товаров, которые доступны для размещения заказа
-      operationId: getAvailableProducts
-      responses:
-        '200':
-          description: Список доступных товаров
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    product_id:
-                      type: integer
-                      description: ID товара
-                    product_name:
-                      type: string
-                      description: Наименование товара
-                    quantity:
-                      type: integer
-                      description: Количество товара
-                    price: 
-                      type: integer
-                      description: Цена товара
         '404':
           description: Товары не найдены
 
@@ -307,8 +433,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  userId:
-                    type: integer
                   first_name:
                     type: string
                   last_name:
@@ -316,10 +440,6 @@ paths:
                   email:
                     type: string
                   phone_number:
-                    type: string
-                  role:
-                    type: string
-                  password:
                     type: string
                   orders:
                     type: array
