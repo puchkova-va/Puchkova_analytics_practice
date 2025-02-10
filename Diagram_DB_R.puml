@@ -1,0 +1,100 @@
+@startuml
+' Настройка отображения
+hide circle
+skinparam linetype ortho
+
+' Сущности
+entity User {
+  *UserID: int (PK, Auto Increment)
+  Name: string
+  Surname: string
+  Email: string
+  PhoneNumber: string
+  DeliveryAddress: string
+  Password: string
+  Role: string
+} 
+
+entity Order {
+  *OrderID: int (PK, Auto Increment)
+  UserID: int (FK)
+  OrderDate: datetime
+  OrderStatus: string
+}
+
+entity Product {
+  *ProductID: int (PK, Auto Increment)
+  Name: string
+  Description: string
+  Price: decimal (10, 2)
+}
+
+entity Delivery {
+  *DeliveryID: int (PK, Auto Increment)
+  OrderID: int (FK)
+  RouteID: int (FK)
+  DeliveryDate: datetime
+  DeliveryStatus: string
+}
+
+entity Route {
+  *RouteID: int (PK, Auto Increment)
+  StartPoint: string
+  EndPoint: string
+  Distance: decimal
+  TravelTime: time
+}
+
+entity Storage {
+  *StorageID: int (PK, Auto Increment)
+  Name: string
+  Location: string
+}
+
+entity Payment {
+  *PaymentID: int (PK, Auto Increment)
+  OrderID: int (FK)
+  Amount: decimal (10, 2)
+  PaymentDate: datetime
+  PaymentStatus: string
+}
+
+entity Tracking {
+  *TrackingID: int (PK, Auto Increment)
+  OrderID: int (FK)
+  CurrentLocation: string
+  UpdateDateTime: datetime
+  TrackingStatus: string
+}
+
+entity Stock {
+  *StockID: int (PK, Auto Increment)
+  ProductID: int (FK)
+  StorageID: int (FK)
+  QuantityInStock: int
+  LastUpdated: datetime
+  Reserved: int
+}
+
+' Связи
+User ||--o{ Order : "1..N"
+
+Order ||--|| Delivery : "1..N"
+Delivery ||--|| Route : "1..1"
+Product ||--|| Stock : "1..1"
+Stock ||--o{ Storage : "1..N"
+Order ||--|| Payment : "1..1"
+Order ||--o{ Tracking : "1..N"
+
+' Промежуточная таблица для связи M:N между Order и Product
+entity OrderItems {
+  *OrderID: int (FK)
+  *ProductID: int (FK)
+  Quantity
+  Status
+}
+
+Order ||--o{ OrderItems : "N..1"
+Product ||--o{ OrderItems : "1..N"
+
+@enduml
