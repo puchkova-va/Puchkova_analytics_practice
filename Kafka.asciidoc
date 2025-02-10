@@ -1,0 +1,132 @@
+### Пример топика: `user_activity`
+
+Описание топика:
+Этот топик будет использоваться для отслеживания активности пользователей на сайте или в приложении. В него будут отправляться события, такие как:
+- Регистрация пользователя
+- Вход в систему
+- Просмотр страницы
+- Добавление товара в корзину
+
+Структура сообщения:
+- event_id (string) — уникальный идентификатор события
+- user_id (string) — идентификатор пользователя
+- event_type (string) — тип события (например, "registration", "login", "page_view", "add_to_cart")
+- timestamp (string) — время события в формате ISO 8601
+- metadata (map/object) — дополнительные данные, зависящие от типа события (например, URL страницы, ID товара и т.д.)
+
+---
+
+### Пример сообщения в формате JSON
+
+{
+  "event_id": "123e4567-e89b-12d3-a456-426614174000",
+  "user_id": "user-12345",
+  "event_type": "page_view",
+  "timestamp": "2025-02-10T14:48:00Z",
+  "metadata": {
+    "page_url": "https://example.com/products/123",
+    "product_id": "123"
+  }
+}
+
+ 
+
+---
+
+### Пример сообщения в формате Avro
+
+Для Avro требуется схема (schema). Пример схемы:
+
+{
+  "type": "record",
+  "name": "UserActivity",
+  "fields": [
+    {"name": "event_id", "type": "string"},
+    {"name": "user_id", "type": "string"},
+    {"name": "event_type", "type": "string"},
+    {"name": "timestamp", "type": "string"},
+    {
+      "name": "metadata",
+      "type": {
+        "type": "map",
+        "values": "string"
+      }
+    }
+  ]
+}
+
+Пример сообщения в бинарном формате Avro (текстовое представление для наглядности):
+{
+  "event_id": "123e4567-e89b-12d3-a456-426614174000",
+  "user_id": "user-12345",
+  "event_type": "page_view",
+  "timestamp": "2025-02-10T14:48:00Z",
+  "metadata": {
+    "page_url": "https://example.com/products/123",
+    "product_id": "123"
+  }
+}
+
+---
+
+### Пример сообщения в формате Protobuf
+
+Для Protobuf также требуется схема. Пример .proto файла:
+syntax = "proto3";
+
+message UserActivity {
+  string event_id = 1;
+  string user_id = 2;
+  string event_type = 3;
+  string timestamp = 4;
+  map<string, string> metadata = 5;
+}
+
+Пример сообщения в бинарном формате Protobuf (текстовое представление для наглядности):
+{
+  "event_id": "123e4567-e89b-12d3-a456-426614174000",
+  "user_id": "user-12345",
+  "event_type": "page_view",
+  "timestamp": "2025-02-10T14:48:00Z",
+  "metadata": {
+    "page_url": "https://example.com/products/123",
+    "product_id": "123"
+  }
+}
+
+---
+
+### Сравнение форматов
+
+1. JSON:
+   - Человекочитаемый.
+   - Прост в использовании, но занимает больше места.
+   - Не требует схемы, но это может привести к проблемам с согласованностью данных.
+
+2. Avro:
+   - Бинарный формат, компактный и эффективный.
+   - Требует схему, что обеспечивает строгую типизацию.
+   - Поддерживает эволюцию схемы (schema evolution).
+
+3. Protobuf:
+   - Бинарный формат, компактный и быстрый.
+   - Требует схему, обеспечивает строгую типизацию.
+   - Поддерживает эволюцию схемы, но менее гибкий, чем Avro.
+
+---
+
+### Дополнительные топики
+
+1. `payment_transactions`:
+   - Для отслеживания платежей.
+   - Сообщения: transaction_id, user_id, amount, currency, status, timestamp.
+
+2. `product_updates`:
+   - Для обновления информации о товарах.
+   - Сообщения: product_id, name, price, stock, timestamp.
+
+3. `error_logs`:
+   - Для логирования ошибок.
+   - Сообщения: error_id, service_name, error_message, stack_trace, timestamp.
+
+Каждый топик может быть реализован в любом из трех форматов (JSON, Avro, Protobuf) в зависимости от требований к производительности, размеру данных и гибкости.
