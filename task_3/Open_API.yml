@@ -4,9 +4,18 @@ info:
   version: '1.0'
 servers:
   - url: https://api.server.test/v1
+tags:
+  - name: orders
+    description: Операции с заказами
+  - name: users
+    description: Операции с пользователями
+  - name: products
+    description: Операции с продуктами
 paths:
   /orders:
     post:
+      tags:
+        - orders
       summary: Создание заказа
       description: Создание нового заказа для пользователя
       operationId: createOrder
@@ -17,7 +26,7 @@ paths:
             schema:
               type: object
               properties:
-                userId:
+                user_Id:
                   type: integer
                   description: ID пользователя, который создает заказ
                 order_date:
@@ -59,6 +68,8 @@ paths:
           description: Ошибка при создании заказа
 
     get:
+      tags:
+        - orders
       summary: Просмотр всех заказов с определенным статусом 
       description: Получение списка всех заказов
       operationId: getAllOrders
@@ -87,10 +98,10 @@ paths:
               schema:
                 type: object
                 properties:
-                  orderId:
+                  order_Id:
                     type: integer
                     description: ID заказа
-                  userId:
+                  user_Id:
                     type: integer
                     description: ID пользователя, который создает заказ
                   order_date:
@@ -135,6 +146,8 @@ paths:
                     type: string
                     description: Статус заказа
     patch:
+      tags:
+        - orders
       summary: Обновление адреса доставки
       description: Изменение адреса доставки для существующего заказа
       operationId: updateDeliveryAddress
@@ -175,6 +188,8 @@ paths:
           description: Заказ с указанным ID не найден
   /orders/{orderId}:
     get:
+      tags:
+        - orders
       summary: Просмотр информации о заказе по ID
       description: Получение информации о заказе по его уникальному идентификатору
       operationId: get-Order-By-Id
@@ -193,10 +208,10 @@ paths:
               schema:
                 type: object
                 properties:
-                  orderId:
+                  order_Id:
                     type: integer
                     description: ID заказа
-                  userId:
+                  user_Id:
                     type: integer
                     description: ID пользователя, который создает заказ
                   order_date:
@@ -242,6 +257,8 @@ paths:
 
   /users/{userId}/orders:
     get:
+      tags:
+        - orders
       summary: Просмотр заказов пользователя по ID
       description: Получение всех заказов конкретного пользователя по его ID
       operationId: getUserOrders
@@ -262,10 +279,10 @@ paths:
                 items: 
                   type: object
                   properties:
-                    orderId:
+                    order_Id:
                       type: integer
                       description: ID заказа
-                    userId:
+                    user_Id:
                       type: integer
                       description: ID пользователя, который создает заказ
                     order_date:
@@ -311,6 +328,8 @@ paths:
 
   /products:
     post:
+      tags:
+        - products
       summary: Создание нового продукта
       description: Добавление нового товара в систему
       operationId: createProduct
@@ -355,6 +374,8 @@ paths:
         '500':
           description: Внутренняя ошибка сервера
     get:
+      tags:
+        - products
       summary: Получить список товаров, доступных для заказа
       description: Получение списка товаров, которые доступны для размещения заказа
       operationId: getAvailableProducts
@@ -412,9 +433,37 @@ paths:
                           description: Цена товара
         '404':
           description: Товары не найдены
-
+  /users:
+    post:
+      tags:
+        - users
+      summary: Добавление пользователя
+      description: Создание нового пользователя в системе
+      operationId: createUsers
+      requestBody:
+        description: Информация о заказе
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                  first_name:
+                    type: string
+                  last_name:
+                    type: string
+                  email:
+                    type: string
+                  phone_number:
+                    type: string
+      responses:
+        '201':
+          description: Аккаунт создан
+        '400':
+          description: Ошибка при регистрации пользователя
   /users/{userId}:
     get:
+      tags:
+        - users
       summary: Просмотр информации о пользователе по ID
       description: Получение информации о пользователе по его уникальному идентификатору
       operationId: getUserInfo
