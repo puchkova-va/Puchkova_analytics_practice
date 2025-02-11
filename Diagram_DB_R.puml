@@ -79,9 +79,9 @@ entity Stock {
 ' Связи
 User ||--o{ Order : "1..N"
 
-Order ||--|| Delivery : "1..N"
+Order }|--|| Delivery : "1..N"
 Delivery ||--|| Route : "1..1"
-Product ||--|| Stock : "1..1"
+Product }|--|| Stock : "N..1"
 Stock ||--o{ Storage : "1..N"
 Order ||--|| Payment : "1..1"
 Order ||--o{ Tracking : "1..N"
