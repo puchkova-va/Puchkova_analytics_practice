@@ -11,6 +11,8 @@ tags:
     description: Операции с пользователями
   - name: products
     description: Операции с продуктами
+  - name: auth
+    description: Авторизация    
 paths:
   /orders:
     post:
@@ -96,55 +98,57 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  order_Id:
-                    type: integer
-                    description: ID заказа
-                  user_Id:
-                    type: integer
-                    description: ID пользователя, который создает заказ
-                  order_date:
-                    type: string
-                    description: Дата офформления заказа
-                  delivery_address: 
-                    type: string
-                    description: Адрес доставки заказа
-                  payment:
-                    type: object
-                    properties:  
-                      payment_id:
-                        type: integer
-                        description: ID оплаты
-                      payment_date: 
-                        type: string
-                        description: дата оплаты 
-                      amount: 
-                        type: integer
-                        description: Оплаченная сумма
-                      payment_status:
-                        type: string
-                        description: Описание статуса оплаты
-                  items:
-                    type: array
-                    items:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    order_Id:
+                      type: integer
+                      description: ID заказа
+                    user_Id:
+                      type: integer
+                      description: ID пользователя, который создает заказ
+                    order_date:
+                      type: string
+                      description: Дата офформления заказа
+                    delivery_address: 
+                      type: string
+                      description: Адрес доставки заказа
+                    payment:
                       type: object
-                      properties:
-                        product_id:
+                      properties:  
+                        payment_id:
                           type: integer
-                          description: ID товара
-                        product_name:
+                          description: ID оплаты
+                        payment_date: 
                           type: string
-                          description: Наименование товара
-                        quantity:
+                          description: дата оплаты 
+                        amount: 
                           type: integer
-                          description: Количество товара
-                        price: 
-                          type: integer
-                          description: Цена товара
-                  order_status:
-                    type: string
-                    description: Статус заказа
+                          description: Оплаченная сумма
+                        payment_status:
+                          type: string
+                          description: Описание статуса оплаты
+                    items:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          product_id:
+                            type: integer
+                            description: ID товара
+                          product_name:
+                            type: string
+                            description: Наименование товара
+                          quantity:
+                            type: integer
+                            description: Количество товара
+                          price: 
+                            type: integer
+                            description: Цена товара
+                    order_status:
+                      type: string
+                      description: Статус заказа
     patch:
       tags:
         - orders
@@ -495,3 +499,241 @@ paths:
                     
         '404':
           description: Пользователь не найден
+  /api/register:
+    post:
+      tags:
+       - auth
+      summary: Регистрация пользователя
+      description: Регистрирует нового пользователя в системе.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - password
+                - email
+      responses:
+        '200':
+          description: Успешная регистрация
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /api/login:
+    post:
+      tags:
+       - auth
+      summary: Логин пользователя
+      description: Аутентифицирует пользователя и возвращает access и refresh токены.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - password
+      responses:
+        '200':
+          description: Успешный вход
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access-token:
+                    type: string
+                  refresh-token:
+                    type: string
+                  expires-in:
+                    type: integer
+        '401':
+          description: неверный логин и/или пароль
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string            
+  /api/check-auth:
+    get:
+      tags:
+       - auth
+      summary: Проверка пользователя
+      description: Проверяет, залогинен ли пользователь в системе.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Успешная проверка
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  is-authenticated:
+                    type: boolean
+                  user:
+                    type: object
+                    properties:
+                      email:
+                        type: string
+        '401':
+          description: Учетные данные отсутствуют или неверны
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /api/forgot-password:
+    post:
+      tags:
+       - auth
+      summary: Запрос на сброс пароля
+      description: Инициирует процесс сброса пароля. Отправляет ссылку для сброса пароля на email пользователя.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: user@example.com
+              required:
+                - email
+      responses:
+        '200':
+          description: Успешный запрос
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '401':
+          description: Учетные данные отсутствуют или неверны
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /api/reset-password:
+    post:
+      tags:
+       - auth
+      summary: Сброс пароля
+      description: Позволяет пользователю сбросить пароль с использованием токена, отправленного на email.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                new-password:
+                  type: string
+              required:
+                - token
+                - new-password
+      responses:
+        '200':
+          description: Успешный сброс пароля
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /api/refresh-token:
+    post:
+      tags:
+       - auth
+      summary: Обновление токена доступа
+      description: Обновляет access token с использованием refresh token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh_token:
+                  type: string
+              required:
+                - refresh_token
+      responses:
+        '200':
+          description: Успешное обновление токена
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  refresh_token:
+                    type: string
+                  expires_in:
+                    type: integer
+
+  /api/change-password:
+    post:
+      tags:
+       - auth
+      summary: Смена пароля
+      description: Позволяет пользователю изменить свой пароль.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                old-password:
+                  type: string
+                new-password:
+                  type: string
+              required:
+                - old_password
+                - new_password
+      responses:
+        '200':
+          description: Успешная смена пароля
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+      
