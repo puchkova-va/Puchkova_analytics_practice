@@ -1,0 +1,317 @@
+## Пример топика: `user_activity`
+
+*Описание топика*:
+Этот топик будет использоваться для отслеживания активности пользователей на сайте или в приложении. В него будут отправляться события, такие как:
+
+- Регистрация пользователя
+- Вход в систему
+- Просмотр страницы
+- Добавление товара в корзину
+
+*Что будет передоваться в сообщении*:
+
+- event_id (string) — уникальный идентификатор события
+- user_id (string) — идентификатор пользователя
+- event_type (string) — тип события (например, "registration", "login", "page_view", "add_to_cart")
+- timestamp (string) — время события в формате ISO 8601
+- metadata (map/object) — дополнительные данные, зависящие от типа события (например, URL страницы, ID товара и т.д.)
+- source (string) — источник события
+- version — ыерсия схемы
+
+*Структура сообщения Kafka*:
+
+1. Ключ (Key):
+   - Используется для партиционирования данных в Kafka. Например, user_id может быть ключом, чтобы все события одного пользователя попадали в одну партицию.
+
+2. Заголовки (Headers):
+   - Метаданные, которые можно добавить к сообщению. Например, source (источник события) или version (версия схемы).
+
+3. Значение (Value):
+   - Основные данные сообщения. В нашем случае это информация о событии активности пользователя.
+
+4. Временная метка (Timestamp):
+   - Время создания сообщения. Может быть задано вручную или автоматически Kafka.
+
+---
+
+##№ Пример сообщения в формате JSON
+
+[source, json]
+{
+  "key": "user-12345",
+  "headers": {
+    "source": "mobile_app",
+    "version": "1.0"
+  },
+  "value": {
+    "event_id": "123e4567-e89b-12d3-a456-426614174000",
+    "event_type": "page_view",
+    "timestamp": "2025-02-10T14:48:00Z",
+    "metadata": {
+      "page_url": "https://example.com/products/123",
+      "product_id": "123"
+    }
+  },
+  "timestamp": "2025-02-10T14:48:00Z"
+}
+
+ 
+
+---
+
+### Пример сообщения в формате Avro
+
+Для Avro требуется схема (schema). Пример схемы:
+
+[source, json]
+{
+     "type": "record",
+     "name": "UserActivity",
+     "fields": [
+       {"name": "event_id", "type": "string"},
+       {"name": "event_type", "type": "string"},
+       {"name": "timestamp", "type": "string"},
+       {
+         "name": "metadata",
+         "type": {
+           "type": "map",
+           "values": "string"
+         }
+       }
+     ]
+   }
+   
+
+Пример сообщения в бинарном формате Avro (текстовое представление для наглядности):
+
+[source, json]
+{
+  "key": "user-12345",
+  "headers": {
+    "source": "mobile_app",
+    "version": "1.0"
+  },
+  "value": {
+    "event_id": "123e4567-e89b-12d3-a456-426614174000",
+    "event_type": "page_view",
+    "timestamp": "2025-02-10T14:48:00Z",
+    "metadata": {
+      "page_url": "https://example.com/products/123",
+      "product_id": "123"
+    }
+  },
+  "timestamp": "2025-02-10T14:48:00Z"
+}
+
+
+---
+
+### Пример сообщения в формате Protobuf
+
+Для Protobuf также требуется схема. Пример .proto файла:
+syntax = "proto3";
+
+[source, json]
+   syntax = "proto3";
+   message UserActivity {
+     string event_id = 1;
+     string event_type = 2;
+     string timestamp = 3;
+     map<string, string> metadata = 4;
+   }
+   
+
+
+Пример сообщения в бинарном формате Protobuf (текстовое представление для наглядности):
+
+[source, json]
+{
+  "key": "user-12345",
+  "headers": {
+    "source": "mobile_app",
+    "version": "1.0"
+  },
+  "value": {
+    "event_id": "123e4567-e89b-12d3-a456-426614174000",
+    "event_type": "page_view",
+    "timestamp": "2025-02-10T14:48:00Z",
+    "metadata": {
+      "page_url": "https://example.com/products/123",
+      "product_id": "123"
+    }
+  },
+  "timestamp": "2025-02-10T14:48:00Z"
+}
+
+---
+
+
+## Описание топика `product_updates`
+
+*Назначение топика*:
+Этот топик будет использоваться для обновления информации о товарах в каталоге. В него будут отправляться события, такие как:
+
+- Добавление нового товара.
+- Обновление цены товара.
+- Изменение количества товара на складе.
+- Удаление товара (отправление товара в стоп-лист).
+
+*Структура сообщения*:
+
+- product_id (string) — уникальный идентификатор товара.
+- name (string) — название товара.
+- price (float) — цена товара.
+- stock (int) — количество товара на складе.
+- timestamp (string) — время обновления в формате ISO 8601.
+- action (string) — тип действия (например, "add", "update", "delete").
+
+---
+
+*Структура сообщения Kafka*:
+
+1. Ключ (Key):
+   - Используется для партиционирования данных в Kafka. Например, product_id может быть ключом, чтобы все события одного товара попадали в одну партицию.
+
+2. Заголовки (Headers):
+   - Метаданные, которые можно добавить к сообщению. Например, source (источник события) или version (версия схемы).
+
+3. Значение (Value):
+   - Основные данные сообщения. В нашем случае о событии изменения информации по товару.
+
+4. Временная метка (Timestamp):
+   - Время создания сообщения. Может быть задано вручную или автоматически Kafka.
+
+---
+
+### Пример сообщения в формате JSON
+
+[source, json]
+{
+  "key": "prod-12345",
+  "headers": {
+    "source": "admin_panel",
+    "version": "1.0"
+  },
+  "value": {
+    "name": "Smartphone X",
+    "price": 599.99,
+    "stock": 100,
+    "timestamp": "2025-02-10T15:30:00Z",
+    "action": "update"
+  },
+  "timestamp": "2025-02-10T15:30:00Z"
+}
+
+ 
+
+---
+
+### Пример сообщения в формате Avro
+
+Для Avro требуется схема (schema). Пример схемы:
+
+[source, json]
+   {
+     "type": "record",
+     "name": "ProductUpdate",
+     "fields": [
+       {"name": "name", "type": "string"},
+       {"name": "price", "type": "float"},
+       {"name": "stock", "type": "int"},
+       {"name": "timestamp", "type": "string"},
+       {"name": "action", "type": "string"}
+     ]
+   }
+   
+
+   
+
+Пример сообщения в бинарном формате Avro (текстовое представление для наглядности):
+
+[source, json]
+{
+  "key": "prod-12345",
+  "headers": {
+    "source": "admin_panel",
+    "version": "1.0"
+  },
+  "value": {
+    "name": "Smartphone X",
+    "price": 599.99,
+    "stock": 100,
+    "timestamp": "2025-02-10T15:30:00Z",
+    "action": "update"
+  },
+  "timestamp": "2025-02-10T15:30:00Z"
+}
+
+
+---
+
+### Пример сообщения в формате Protobuf
+
+Для Protobuf также требуется схема. Пример .proto файла:
+syntax = "proto3";
+
+[source, json]
+   syntax = "proto3";
+   message ProductUpdate {
+     string name = 1;
+     float price = 2;
+     int32 stock = 3;
+     string timestamp = 4;
+     string action = 5;
+   }
+   
+
+
+
+Пример сообщения в бинарном формате Protobuf (текстовое представление для наглядности):
+
+[source, json]
+{
+  "key": "prod-12345",
+  "headers": {
+    "source": "admin_panel",
+    "version": "1.0"
+  },
+  "value": {
+    "name": "Smartphone X",
+    "price": 599.99,
+    "stock": 100,
+    "timestamp": "2025-02-10T15:30:00Z",
+    "action": "update"
+  },
+  "timestamp": "2025-02-10T15:30:00Z"
+}
+
+### Сравнение форматов
+
+1. JSON:
+   - Человекочитаемый.
+   - Прост в использовании, но занимает больше места.
+   - Не требует схемы, но это может привести к проблемам с согласованностью данных.
+
+2. Avro:
+   - Бинарный формат, компактный и эффективный.
+   - Требует схему, что обеспечивает строгую типизацию.
+   - Поддерживает эволюцию схемы (schema evolution).
+
+3. Protobuf:
+   - Бинарный формат, компактный и быстрый.
+   - Требует схему, обеспечивает строгую типизацию.
+   - Поддерживает эволюцию схемы, но менее гибкий, чем Avro.
+
+---
+
+### Дополнительные топики
+
+1. `payment_transactions`:
+   - Для отслеживания платежей.
+   - Сообщения: transaction_id, user_id, amount, currency, status, timestamp.
+
+2. `error_logs`:
+   - Для логирования ошибок.
+   - Сообщения: error_id, service_name, error_message, stack_trace, timestamp.
+
+Каждый топик может быть реализован в любом из трех форматов (JSON, Avro, Protobuf) в зависимости от требований к производительности, размеру данных и гибкости.
