@@ -702,6 +702,35 @@ paths:
                     type: string
                   expires_in:
                     type: integer
+  /api/logout:
+    post:
+      tags:
+       - auth
+      summary: Логаут пользователя
+      description: Удаляет refresh token из системы, завершая сессию пользователя.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh_token:
+                  type: string
+              required:
+                - refresh_token
+      responses:
+        '200':
+          description: Успешный выход
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
 
   /api/change-password:
     post:
